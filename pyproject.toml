@@ -1,9 +1,18 @@
 [project]
 name = "smart-support-desk-openenv"
 version = "0.1.0"
-description = "OpenEnv Smart Support Desk"
-authors = [{ name = "vamshi" }]
-dependencies = []
+description = "OpenEnv project"
+authors = [{ name = "your-name" }]
+dependencies = [
+    "openenv-core>=0.2.0",
+    "fastapi",
+    "uvicorn",
+    "requests",
+    "openai"
+]
+
+[project.scripts]
+server = "server.app:app"
 
 [tool.openenv]
 entrypoint = "inference.py"
