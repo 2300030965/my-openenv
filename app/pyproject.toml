@@ -1,0 +1,9 @@
+[project]
+name = "smart-support-desk-openenv"
+version = "0.1.0"
+description = "OpenEnv Smart Support Desk"
+authors = [{ name = "vamshi" }]
+dependencies = []
+
+[tool.openenv]
+entrypoint = "inference.py"
