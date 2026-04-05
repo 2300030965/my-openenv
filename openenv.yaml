@@ -1,0 +1,7 @@
+name: smart-support-desk-openenv
+entrypoint: app.env:SmartSupportDeskEnv
+
+tasks:
+  - name: ticket_triage_easy
+  - name: ticket_triage_medium
+  - name: ticket_triage_hard
