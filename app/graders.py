@@ -10,4 +10,4 @@ def grade(memory, ticket):
     if memory.get("resolved"):
         score += 0.4
 
-    return min(score, 1.0)
+    return max(0.1, min(score, 0.9))   # ✅ IMPORTANT

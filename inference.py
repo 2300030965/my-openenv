@@ -2,15 +2,27 @@ import os
 import json
 from typing import List, Optional
 
+# ==============================
+# LOAD ENV VARIABLES (VERY IMPORTANT)
+# ==============================
+from dotenv import load_dotenv
+from pathlib import Path
+
+env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(dotenv_path=env_path)
+
 from openai import OpenAI
 import requests
 
 # ==============================
-# ENV VARIABLES (REQUIRED)
+# ENV VARIABLES
 # ==============================
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
 API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
+
+# 🔍 DEBUG (remove later)
+print("DEBUG API_KEY:", API_KEY)
 
 TASK_NAME = os.getenv("TASK_NAME", "ticket_triage_easy")
 BENCHMARK = "smart-support-desk-openenv"
@@ -19,7 +31,7 @@ MAX_STEPS = 6
 BASE_URL = "http://localhost:7860"
 
 # ==============================
-# VALIDATION (IMPORTANT)
+# VALIDATION
 # ==============================
 if not API_KEY:
     raise ValueError("❌ HF_TOKEN / API_KEY is missing")
@@ -33,7 +45,7 @@ client = OpenAI(
 )
 
 # ==============================
-# LOGGING FUNCTIONS (MANDATORY)
+# LOGGING FUNCTIONS
 # ==============================
 def log_start(task: str, env: str, model: str):
     print(f"[START] task={task} env={env} model={model}", flush=True)
@@ -54,7 +66,6 @@ def log_end(success: bool, steps: int, rewards: List[float]):
         flush=True
     )
 
-
 # ==============================
 # SAFE JSON PARSER
 # ==============================
@@ -62,7 +73,6 @@ def safe_json_parse(text: str):
     try:
         return json.loads(text)
     except:
-        # Try to extract JSON manually
         try:
             start = text.find("{")
             end = text.rfind("}") + 1
@@ -73,9 +83,8 @@ def safe_json_parse(text: str):
                 "payload": {}
             }
 
-
 # ==============================
-# LLM ACTION GENERATOR
+# LLM ACTION
 # ==============================
 def get_action_from_llm(observation: dict) -> dict:
     prompt = f"""
@@ -105,18 +114,17 @@ Return ONLY JSON:
         )
 
         text = response.choices[0].message.content.strip()
-
         return safe_json_parse(text)
 
-    except Exception:
+    except Exception as e:
+        print("LLM ERROR:", e)
         return {
             "action_type": "resolve",
             "payload": {}
         }
 
-
 # ==============================
-# MAIN EXECUTION
+# MAIN
 # ==============================
 def main():
     rewards = []
@@ -126,7 +134,6 @@ def main():
     log_start(TASK_NAME, BENCHMARK, MODEL_NAME)
 
     try:
-        # RESET ENV
         result = requests.post(
             f"{BASE_URL}/reset",
             params={"task_name": TASK_NAME}
@@ -175,7 +182,6 @@ def main():
         )
 
     log_end(success, steps_taken, rewards)
-
 
 # ==============================
 # RUN

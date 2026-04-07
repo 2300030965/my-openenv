@@ -1,21 +1,20 @@
 from app.data import TICKETS
-
-# Split tickets into 3 levels (simple logic)
-EASY_TICKETS = TICKETS[:1]
-MEDIUM_TICKETS = TICKETS
-HARD_TICKETS = TICKETS
+from app.graders import grade
 
 TASKS = {
     "ticket_triage_easy": {
-        "tickets": EASY_TICKETS,
-        "max_steps": 4
+        "tickets": TICKETS[:2],
+        "max_steps": 4,
+        "grader": grade
     },
     "ticket_triage_medium": {
-        "tickets": MEDIUM_TICKETS,
-        "max_steps": 5
+        "tickets": TICKETS,
+        "max_steps": 5,
+        "grader": grade
     },
     "ticket_triage_hard": {
-        "tickets": HARD_TICKETS,
-        "max_steps": 6
+        "tickets": TICKETS,
+        "max_steps": 6,
+        "grader": grade
     }
 }
