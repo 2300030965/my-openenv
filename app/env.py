@@ -67,9 +67,9 @@ class SmartSupportDeskEnv:
             elif action.action_type == "resolve":
                 self.memory["resolved"] = True
 
-               
+                
                 task = TASKS[self.current_task_name]
-                reward += task["grader"](self.memory)
+                reward += task["grader"](self.memory, self.ticket)
 
                 self.done = True
 
