@@ -1,7 +1,9 @@
+# app/env.py
+
 import random
 from app.tasks import TASKS
-from app.graders import grade
 from app.models import Observation, StepResult
+
 
 class SmartSupportDeskEnv:
 
@@ -12,13 +14,21 @@ class SmartSupportDeskEnv:
         self.step_count = 0
         self.max_steps = 5
         self.done = False
+        self.current_task_name = None
 
     def reset(self, task_name="ticket_triage_easy"):
         task = TASKS[task_name]
+
+        self.current_task_name = task_name
         self.ticket = random.choice(task["tickets"])
         self.max_steps = task["max_steps"]
 
-        self.memory = {"priority": None, "team": None, "resolved": False}
+        self.memory = {
+            "priority": None,
+            "team": None,
+            "resolved": False
+        }
+
         self.history = []
         self.step_count = 0
         self.done = False
@@ -56,12 +66,16 @@ class SmartSupportDeskEnv:
 
             elif action.action_type == "resolve":
                 self.memory["resolved"] = True
-                reward += grade(self.memory, self.ticket)
+
+               
+                task = TASKS[self.current_task_name]
+                reward += task["grader"](self.memory)
+
                 self.done = True
 
             self.history.append(str(action.action_type))
 
-        except Exception as e:
+        except Exception:
             reward -= 0.1
 
         if self.step_count >= self.max_steps:
