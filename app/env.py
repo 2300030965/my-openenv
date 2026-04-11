@@ -21,7 +21,9 @@ class SmartSupportDeskEnv:
 
         self.current_task_name = task_name
         self.ticket = random.choice(task["tickets"])
-        self.max_steps = task["max_steps"]
+
+        # 🔥 FORCE minimum steps (VERY IMPORTANT)
+        self.max_steps = max(task["max_steps"], 3)
 
         self.memory = {
             "priority": None,
@@ -53,6 +55,8 @@ class SmartSupportDeskEnv:
 
     def step(self, action):
         self.step_count += 1
+
+        # 🔥 BASE REWARD (never zero)
         reward = 0.2
 
         try:
@@ -64,7 +68,7 @@ class SmartSupportDeskEnv:
 
             elif action.action_type == "resolve":
                 self.memory["resolved"] = True
-                self.done = True
+                # ❌ DO NOT END HERE
 
             # 🔥 ALWAYS CALL GRADER
             task = TASKS[self.current_task_name]
@@ -73,8 +77,9 @@ class SmartSupportDeskEnv:
             self.history.append(str(action.action_type))
 
         except Exception:
-            reward = 0.3
+            reward = 0.3  # safety
 
+        # 🔥 ONLY END AFTER MULTIPLE STEPS
         if self.step_count >= self.max_steps:
             self.done = True
 
